@@ -18,10 +18,20 @@ Local-inference web application for matching front/back label images to applicat
   - During the current prototype, this is a limited feature.
 - `pass | needs_review` outputs with machine-readable finding codes.
 
+## Test files
+You can find sample application files in the [`docs/`](docs/) directory.
+
+- [Sample Application 1 (PDF)](docs/sample%20application.pdf)
+- [Sample Application 2 (PDF)](docs/sample%20application%202.pdf) - should reject with no labels
+- [Sample Application 3 (PDF)](docs/sample%20application%203.pdf)
+
+## Live demo
+
+You may visit [treasury.jackmao.software](https://treasury.jackmao.software) for a live demo. Please note that there may be a 1-2 minute cold start after 3/20. Currently using AWS EC2 to host the server and HuggingFace to host the VLM, but the VLM can be hosted locally (see below for local setup instructions).
+
 ## Approach
 
 See [docs/approach.md](docs/approach.md) for full details on architecture and validation logic.
-
 
 ## Project layout
 
