@@ -121,3 +121,7 @@ Any failed required check drives overall status to `fail` (displayed as `needs_r
 - Regulatory logic is a focused prototype rule set, not exhaustive CFR codification.
 - The frontend's main workflow currently assumes labels are affixed in predictable PDF regions (fixed crop defaults) and that the PDF is in legal 8.5" x 14" dimensions as required.
 - Batch endpoint (`/api/verify/batch`) exists server-side, but the UI currently performs client-managed per-file calls to `/api/verify`.
+
+## Tools used
+
+Cursor, Ollama, Git
