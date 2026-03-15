@@ -72,7 +72,7 @@ export interface BatchResultItem {
   result: VerificationResult;
 }
 
-const API_BASE = (import.meta.env.VITE_API_BASE ?? "/api").replace(/\/$/, "");
+const API_BASE = "/api";
 
 function apiUrl(path: string): string {
   return `${API_BASE}${path}`;
