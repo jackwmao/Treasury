@@ -72,7 +72,11 @@ export interface BatchResultItem {
   result: VerificationResult;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+
+function apiUrl(path: string): string {
+  return `${API_BASE}${path}`;
+}
 
 async function buildApiError(response: Response): Promise<Error> {
   const raw = await response.text();
@@ -105,7 +109,7 @@ async function buildApiError(response: Response): Promise<Error> {
 export async function verifySingle(pdf: File): Promise<VerificationResult> {
   const form = new FormData();
   form.append("application_pdf", pdf);
-  const response = await fetch(`${API_BASE}/api/verify`, {
+  const response = await fetch(apiUrl("/api/verify"), {
     method: "POST",
     body: form
   });
@@ -119,7 +123,7 @@ export async function debugPdfTable(pdf: File): Promise<PdfTableDebugResponse> {
   const form = new FormData();
   form.append("application_pdf", pdf);
 
-  const response = await fetch(`${API_BASE}/api/debug/pdf-table`, {
+  const response = await fetch(apiUrl("/api/debug/pdf-table"), {
     method: "POST",
     body: form
   });
@@ -143,7 +147,7 @@ export async function debugPdfPicker(pdf: File, page = 0): Promise<PdfPickerResp
   form.append("application_pdf", pdf);
   form.append("page", String(page));
 
-  const response = await fetch(`${API_BASE}/api/debug/pdf-picker`, {
+  const response = await fetch(apiUrl("/api/debug/pdf-picker"), {
     method: "POST",
     body: form
   });

@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import List
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -34,6 +34,7 @@ from app.vlm.validation import evaluate_vlm_text
 load_dotenv(Path(__file__).resolve().parents[1] / ".env.local")
 
 app = FastAPI(title="Local AI Label Verifier", version="0.1.0")
+api = APIRouter(prefix="/api")
 logger = logging.getLogger("uvicorn.error")
 
 VERIFY_LABEL_BBOX = {
@@ -81,7 +82,7 @@ async def ensure_localhost_cors(request, call_next):
     return response
 
 
-@app.get("/api/health")
+@api.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
@@ -124,7 +125,7 @@ def _rejected_response(message: str, status_code: int = 422) -> JSONResponse:
     return JSONResponse(status_code=status_code, content={"result": "rejected", "message": message})
 
 
-@app.post("/api/verify", response_model=VerificationResult)
+@api.post("/verify", response_model=VerificationResult)
 async def verify_single(
     application_pdf: UploadFile = File(...),
 ) -> VerificationResult:
@@ -185,7 +186,7 @@ async def verify_single(
     return result
 
 
-@app.post("/api/verify/batch", response_model=List[BatchResultItem])
+@api.post("/verify/batch", response_model=List[BatchResultItem])
 async def verify_batch(
     application_pdfs: List[UploadFile] = File(...),
     label_images: List[UploadFile] = File(...),
@@ -248,7 +249,7 @@ async def verify_batch(
     return results
 
 
-@app.post("/api/debug/pdf-table")
+@api.post("/debug/pdf-table")
 async def debug_pdf_table(application_pdf: UploadFile = File(...)) -> dict:
     if not application_pdf.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="application_pdf must be a PDF.")
@@ -261,7 +262,7 @@ async def debug_pdf_table(application_pdf: UploadFile = File(...)) -> dict:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.post("/api/debug/pdf-picker")
+@api.post("/debug/pdf-picker")
 async def debug_pdf_picker(application_pdf: UploadFile = File(...), page: int = Form(0)) -> dict:
     """Render PDF page to image for interactive coordinate picking."""
     if not application_pdf.filename.lower().endswith(".pdf"):
@@ -270,4 +271,7 @@ async def debug_pdf_picker(application_pdf: UploadFile = File(...), page: int = 
     if not pdf_bytes:
         raise HTTPException(status_code=400, detail="Empty file upload.")
     return await asyncio.to_thread(render_pdf_page_for_picker, pdf_bytes, page)
+
+
+app.include_router(api)
 
